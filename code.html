@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УНО РЕКОРДС | Форма для артистов</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #6366f1;
+            --bg: #fbfbfd; 
+            --card: #ffffff;
+            --text-main: #1d1d1f;
+            --text-sec: #86868b;
+            --input-bg: rgba(0, 0, 0, 0.02);
+            --radius-lg: 24px;
+            --radius-sm: 14px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container { width: 100%; max-width: 700px; animation: fadeIn 0.6s ease-out; }
+
+        /* ШАПКА */
+        .header-box {
+            background: linear-gradient(135deg, #000000 0%, #1e1e1e 100%);
+            border-radius: var(--radius-lg);
+            padding: 50px 30px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-box::before {
+            content: "";
+            position: absolute;
+            top: -50%; left: -20%;
+            width: 250px; height: 250px;
+            background: var(--accent);
+            filter: blur(100px);
+            opacity: 0.3;
+        }
+
+        .header-box h1 { 
+            margin: 0; 
+            font-size: 42px; 
+            font-weight: 800; 
+            letter-spacing: -1.5px;
+            background: linear-gradient(to bottom, #fff 40%, #a5a5a5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-box p { 
+            margin: 15px 0 0; 
+            color: var(--accent);
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            font-size: 13px; 
+            font-weight: 600; 
+            position: relative;
+            z-index: 1;
+        }
+
+        /* УВЕДОМЛЕНИЯ */
+        #notification-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.85);
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            color: #1d1d1f;
+            padding: 16px 24px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08), 0 0 1px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.4);
+            transform: translateX(130%);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            align-items: center;
+            min-width: 280px;
+        }
+
+        .toast.show { transform: translateX(0); }
+
+        .toast::before {
+            content: "✦";
+            margin-right: 14px;
+            color: var(--accent);
+            font-size: 18px;
+        }
+
+        .toast.error::before {
+            content: "⚠️";
+            color: #ff3b30;
+            font-size: 18px;
+        }
+
+        .toast.success::before {
+            content: "✅";
+            color: #34c759;
+            font-size: 18px;
+        }
+
+        /* КАРТОЧКИ */
+        .q-card {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 35px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-sec);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 10px;
+        }
+
+        .input-group { margin-bottom: 25px; }
+
+        label { 
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700; 
+            font-size: 13px; 
+            color: var(--text-sec); 
+            margin-bottom: 8px; 
+            padding-left: 2px;
+        }
+
+        label .required {
+            color: #ff3b30;
+            font-size: 16px;
+        }
+
+        label .hint {
+            color: #999;
+            font-weight: 400;
+            font-size: 11px;
+        }
+
+        .field-note {
+            font-size: 12px;
+            color: var(--text-sec);
+            margin-top: 6px;
+            padding-left: 2px;
+        }
+
+        .field-example {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 4px;
+            padding-left: 2px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid #e5e5e7;
+            background: var(--input-bg);
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 17px;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            background: #fff;
+            border-color: #000;
+        }
+
+        input.error, select.error, textarea.error {
+            border-color: #ff3b30;
+            background-color: rgba(255, 59, 48, 0.02);
+        }
+
+        input[readonly], select[readonly] {
+            background-color: #f5f5f7;
+            cursor: not-allowed;
+            color: #555;
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* КОНТРАКТ И ПОДПИСЬ */
+        .contract-viewer {
+            background: #f9f9fb;
+            border-radius: var(--radius-sm);
+            padding: 25px;
+            height: 220px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #444;
+            border: 1px solid #efeff3;
+            margin-bottom: 25px;
+        }
+
+        .sig-container {
+            background: #fff;
+            border: 1px solid #e5e5e7;
+            border-radius: var(--radius-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sig-container.error {
+            border-color: #ff3b30;
+        }
+
+        canvas { width: 100%; height: 180px; cursor: crosshair; touch-action: none; background: #fff; }
+        
+        .sig-clear {
+            position: absolute; top: 15px; right: 15px;
+            font-size: 12px; font-weight: 800; cursor: pointer; 
+            color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px;
+            z-index: 10;
+        }
+
+        /* КНОПКА */
+        .footer-area {
+            text-align: center;
+            margin-top: 50px;
+            padding-bottom: 60px;
+        }
+
+        .submit-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 300px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        .footer-text {
+            font-size: 12px;
+            color: var(--text-sec);
+            margin-top: 20px;
+            line-height: 1.6;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) { 
+            .grid, .grid-3 { grid-template-columns: 1fr; } 
+            .q-card { padding: 25px; }
+            .submit-btn { min-width: 260px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="notification-container"></div>
+
+<div class="container">
+    <div class="header-box">
+        <h1>УНО РЕКОРДС</h1>
+        <p>ФОРМА ДЛЯ АРТИСТОВ</p>
+    </div>
+
+    <form id="artistForm" novalidate>
+        <!-- БЛОК 1: Сценическое имя -->
+        <div class="q-card">
+            <div class="section-title">Сценическое имя</div>
+            <div class="input-group">
+                <label>
+                    Псевдоним артиста правильной раскладкой и регистром
+                    <span class="required">*</span>
+                </label>
+                <input type="text" name="stage_name" placeholder="Например: Uno Records, uno records, УНО РЕКОРДС">
+                <div class="field-note">Обязательное поле</div>
+            </div>
+        </div>
+
+        <!-- БЛОК 2: Личные данные -->
+        <div class="q-card">
+            <div class="section-title">Личные данные</div>
+            
+            <div class="grid">
+                <div class="input-group">
+                    <label>Гражданство <span class="required">*</span></label>
+                    <input type="text" name="citizenship" value="РФ" readonly>
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>ФИО <span class="required">*</span></label>
+                    <input type="text" name="full_name">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 3: Паспортные данные -->
+        <div class="q-card">
+            <div class="section-title">Паспортные данные</div>
+            
+            <div class="grid">
+                <div class="input-group">
+                    <label>Дата рождения <span class="required">*</span></label>
+                    <input type="date" name="birth_date">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Серия и номер паспорта <span class="required">*</span></label>
+                    <input type="text" name="passport_num" placeholder="0000 000000">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="input-group">
+                    <label>Дата выдачи <span class="required">*</span></label>
+                    <input type="date" name="issue_date">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Кем выдан <span class="required">*</span></label>
+                    <input type="text" name="issued_by">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="input-group">
+                    <label>Код подразделения <span class="required">*</span></label>
+                    <input type="text" name="department_code" placeholder="000-000">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Адрес регистрации <span class="required">*</span></label>
+                    <input type="text" name="registration_address" placeholder="как в паспорте">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Место рождения <span class="required">*</span></label>
+                <input type="text" name="birth_place" placeholder="По паспорту ~ Россия, Самарская область, город Тольятти">
+                <div class="field-note">Обязательное поле</div>
+            </div>
+        </div>
+
+        <!-- БЛОК 4: ИНН и СНИЛС -->
+        <div class="q-card">
+            <div class="section-title">Идентификационные номера</div>
+            
+            <div class="grid">
+                <div class="input-group">
+                    <label>ИНН <span class="required">*</span></label>
+                    <input type="text" name="inn">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>СНИЛС <span class="required">*</span></label>
+                    <input type="text" name="snils" placeholder="000-000-000 00">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 5: Банковские реквизиты -->
+        <div class="q-card">
+            <div class="section-title">Банковские реквизиты</div>
+            
+            <div class="grid">
+                <div class="input-group">
+                    <label>Расчётный счёт <span class="required">*</span></label>
+                    <input type="text" name="account_number">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Банк получателя <span class="required">*</span></label>
+                    <input type="text" name="bank_name">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 6: Контакты -->
+        <div class="q-card">
+            <div class="section-title">Контакты</div>
+            
+            <div class="grid">
+                <div class="input-group">
+                    <label>Номер телефона <span class="required">*</span></label>
+                    <input type="tel" name="phone" placeholder="+7 (___) ___-__-__">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Эл. почта <span class="required">*</span></label>
+                    <input type="email" name="email" placeholder="example@mail.com">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="input-group">
+                    <label>Личная страница ВКонтакте <span class="required">*</span></label>
+                    <input type="url" name="vk" placeholder="https://vk.com/id...">
+                    <div class="field-note">Обязательное поле</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Личный Telegram</label>
+                    <input type="text" name="telegram" placeholder="@username">
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 7: Договор и подпись -->
+        <div class="q-card">
+            <div class="section-title">Договор присоединения</div>
+            <div class="contract-viewer">
+                <strong>ЛИЦЕНЗИОННЫЙ ДОГОВОР № [*]</strong><br><br>
+                ИП Нуруллаев Октай Закирович («Лицензиат») и Артист («Лицензиар»), указанный в данной анкете, заключили настоящий договор о нижеследующем:<br><br>
+                1. ПРЕДМЕТ ДОГОВОРА: Лицензиар предоставляет Лицензиату исключительную лицензию на использование музыкальных произведений...<br><br>
+                2. ПРАВА: Лицензиат вправе использовать Объекты следующими способами: воспроизведение, распространение, доведение до всеобщего сведения через сеть Интернет...<br><br>
+                3. ГАРАНТИИ: Лицензиар гарантирует, что обладает всеми необходимыми правами на передаваемые материалы и они не нарушают прав третьих лиц.<br><br>
+                [Текст договора сокращен для примера]
+            </div>
+
+            <label>Ваша электронная подпись <span class="required">*</span></label>
+            <div class="sig-container" id="sigContainer">
+                <canvas id="canvas"></canvas>
+                <div class="sig-clear" id="clear">Очистить</div>
+            </div>
+            
+            <div style="margin-top: 25px; display: flex; align-items: flex-start; gap: 12px;">
+                <input type="checkbox" id="agreement" style="width: 18px; height: 18px; accent-color: #000; margin-top: 2px;">
+                <span style="font-size: 14px; color: var(--text-sec); line-height: 1.5;">Я подтверждаю корректность данных и соглашаюсь с условиями оферты <span class="required">*</span></span>
+            </div>
+        </div>
+
+        <div class="footer-area">
+            <button type="submit" class="submit-btn" id="submitBtn">Подписать и отправить</button>
+            <p class="footer-text">Данная форма имеет юридическую силу. После отправки данные будут переданы в юридический отдел лейбла.</p>
+        </div>
+    </form>
+</div>
+
+<script>
+    // --- НАСТРОЙКИ ---
+    const BOT_TOKEN = 'ТВОЙ_ТОКЕН';
+    const CHAT_ID = 'ТВОЙ_ID';
+
+    // Функция уведомлений
+    function notify(text, type = 'info') {
+        const container = document.getElementById('notification-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = text;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100px)';
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
+
+    // Настройка холста (Signature)
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    function resize() {
+        const ratio = window.devicePixelRatio || 1;
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = 180 * ratio;
+        ctx.scale(ratio, ratio);
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#000';
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function pos(e) {
+        const r = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - r.left, y: clientY - r.top };
+    }
+
+    const start = (e) => { 
+        drawing = true; 
+        const p = pos(e); 
+        ctx.beginPath(); 
+        ctx.moveTo(p.x, p.y); 
+        if(e.touches) e.preventDefault();
+        document.getElementById('sigContainer').classList.remove('error');
+    };
+    
+    const move = (e) => { 
+        if(!drawing) return; 
+        const p = pos(e); 
+        ctx.lineTo(p.x, p.y); 
+        ctx.stroke(); 
+        if(e.touches) e.preventDefault(); 
+    };
+    
+    const stop = () => drawing = false;
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+    canvas.addEventListener('touchstart', start, {passive: false});
+    canvas.addEventListener('touchmove', move, {passive: false});
+    canvas.addEventListener('touchend', stop);
+
+    document.getElementById('clear').onclick = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('sigContainer').classList.remove('error');
+    };
+
+    // Функция проверки формы
+    function validateForm() {
+        let isValid = true;
+        let firstError = null;
+
+        document.querySelectorAll('input:not([readonly]), select, textarea').forEach(input => {
+            input.classList.remove('error');
+        });
+        document.getElementById('sigContainer').classList.remove('error');
+
+        const fields = [
+            { name: 'stage_name', label: 'Сценическое имя' },
+            { name: 'full_name', label: 'ФИО' },
+            { name: 'birth_date', label: 'Дата рождения' },
+            { name: 'passport_num', label: 'Серия и номер паспорта' },
+            { name: 'issue_date', label: 'Дата выдачи' },
+            { name: 'issued_by', label: 'Кем выдан' },
+            { name: 'department_code', label: 'Код подразделения' },
+            { name: 'registration_address', label: 'Адрес регистрации' },
+            { name: 'birth_place', label: 'Место рождения' },
+            { name: 'inn', label: 'ИНН' },
+            { name: 'snils', label: 'СНИЛС' },
+            { name: 'account_number', label: 'Расчётный счёт' },
+            { name: 'bank_name', label: 'Банк получателя' },
+            { name: 'phone', label: 'Номер телефона' },
+            { name: 'email', label: 'Эл. почта' },
+            { name: 'vk', label: 'Страница ВКонтакте' }
+        ];
+
+        for (let field of fields) {
+            const input = document.querySelector(`[name="${field.name}"]`);
+            if (input && !input.value.trim()) {
+                input.classList.add('error');
+                if (!firstError) {
+                    firstError = input;
+                    notify(`Поле "${field.label}" обязательно для заполнения`, 'error');
+                }
+                isValid = false;
+            }
+        }
+
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width; blank.height = canvas.height;
+        if (canvas.toDataURL() === blank.toDataURL()) {
+            document.getElementById('sigContainer').classList.add('error');
+            if (isValid) {
+                notify('Пожалуйста, поставьте подпись', 'error');
+            }
+            isValid = false;
+        }
+
+        const agreement = document.getElementById('agreement');
+        if (!agreement.checked) {
+            if (isValid) {
+                notify('Необходимо подтвердить согласие с условиями', 'error');
+            }
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Отправка формы
+    document.getElementById('artistForm').onsubmit = async function(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = "Отправка...";
+        btn.disabled = true;
+
+        const f = new FormData(this);
+        
+        // Формируем сообщение со всеми полями
+        let msg = `✒️ *НОВЫЙ КОНТРАКТ: UNO RECORDS*\n\n` +
+                  `🎙 *Сценическое имя:* ${f.get('stage_name')}\n` +
+                  `👤 *ФИО:* ${f.get('full_name')}\n` +
+                  `🌍 *Гражданство:* РФ\n` +
+                  `📅 *Дата рождения:* ${f.get('birth_date')}\n` +
+                  `📑 *Паспорт:* ${f.get('passport_num')}\n` +
+                  `📅 *Дата выдачи:* ${f.get('issue_date')}\n` +
+                  `🏢 *Кем выдан:* ${f.get('issued_by')}\n` +
+                  `🔢 *Код подразделения:* ${f.get('department_code')}\n` +
+                  `🏠 *Адрес регистрации:* ${f.get('registration_address')}\n` +
+                  `📍 *Место рождения:* ${f.get('birth_place')}\n` +
+                  `🔢 *ИНН:* ${f.get('inn')}\n` +
+                  `🔢 *СНИЛС:* ${f.get('snils')}\n` +
+                  `💰 *Расчётный счёт:* ${f.get('account_number')}\n` +
+                  `🏦 *Банк:* ${f.get('bank_name')}\n` +
+                  `📞 *Телефон:* ${f.get('phone')}\n` +
+                  `📧 *Email:* ${f.get('email')}\n` +
+                  `📱 *VK:* ${f.get('vk')}\n`;
+
+        const telegramValue = f.get('telegram');
+        if (telegramValue) {
+            msg += `📱 *Telegram:* ${telegramValue}\n`;
+        }
+
+        try {
+            const img = canvas.toDataURL("image/png");
+            const blob = await (await fetch(img)).blob();
+            
+            const tgF = new FormData();
+            tgF.append('chat_id', CHAT_ID);
+            tgF.append('caption', msg);
+            tgF.append('photo', blob, 'signature.png');
+            tgF.append('parse_mode', 'Markdown');
+
+            const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: tgF });
+            
+            if(r.ok) { 
+                notify('Контракт успешно отправлен!', 'success');
+                setTimeout(() => location.reload(), 2500);
+            } else { 
+                notify('Ошибка при отправке. Проверьте настройки бота.', 'error'); 
+                btn.disabled = false;
+                btn.innerText = "Подписать и отправить";
+            }
+        } catch(err) { 
+            notify('Ошибка сети. Попробуйте снова.', 'error'); 
+            btn.disabled = false;
+            btn.innerText = "Подписать и отправить";
+        }
+    };
+
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('invalid', (e) => e.preventDefault());
+    });
+
+    window.addEventListener('load', () => {
+        setTimeout(() => notify('Добро пожаловать в UNO RECORDS'), 600);
+    });
+</script>
+
+</body>
+</html>
